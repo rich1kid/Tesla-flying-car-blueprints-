@@ -1,0 +1,473 @@
+<title>Roadster Flight Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: stacked drawing sheets on a blueprint grid, each with a header strip and a title block. Single deliberate look (blueprint blue). */
+:root {
+  --bg: #0e3a80;
+  --panel: rgba(8, 36, 88, 0.72);
+  --ink: #eaf2ff;
+  --dim: #9db9e8;
+  --chalk: #ffd96b;
+  --grid: rgba(234, 242, 255, 0.07);
+  --grid2: rgba(234, 242, 255, 0.15);
+  --f-disp: "Barlow Condensed", "Arial Narrow", "DejaVu Sans Condensed", sans-serif;
+  --f-body: "Barlow", "Segoe UI", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid2) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-block: 24px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.sheet { border: 2px solid var(--ink); background: var(--panel); min-width: 0; }
+.sheet-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px;
+  padding: 9px 14px; border-bottom: 1px solid var(--ink);
+  font: 500 12px var(--f-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--dim);
+}
+.sheet-body { padding: 18px 14px 16px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+h1 {
+  font: 600 clamp(34px, 8vw, 58px)/0.98 var(--f-disp); text-transform: uppercase;
+  letter-spacing: 0.02em; margin: 0; text-wrap: balance;
+}
+h2 {
+  font: 600 clamp(26px, 5.5vw, 34px)/1.05 var(--f-disp); text-transform: uppercase;
+  letter-spacing: 0.03em; margin: 0; text-wrap: balance;
+}
+h3 { font: 500 13px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--chalk); margin: 0 0 6px; }
+p { margin: 0; max-width: 68ch; }
+.stamp {
+  display: inline-block; align-self: flex-start; border: 1.5px solid var(--chalk); color: var(--chalk);
+  font: 500 12px var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 9px;
+}
+.scroll { overflow-x: auto; border: 1px dashed var(--dim); padding: 8px; min-width: 0; }
+.scroll svg { display: block; min-width: 640px; width: 100%; height: auto; }
+.note { border: 1.5px dashed var(--chalk); padding: 12px 14px; min-width: 0; }
+.note ul, .plain ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 6px; }
+.note li, .plain li { max-width: 66ch; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.cols > * { min-width: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { font: 500 12px var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+td { padding: 8px 10px 8px 0; border-bottom: 1px dashed var(--dim); vertical-align: top; }
+td.m, th.m { font-family: var(--f-mono); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tb { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 1px solid var(--ink); }
+.tb div { padding: 7px 14px; border-right: 1px solid var(--dim); font: 400 11.5px var(--f-mono); letter-spacing: 0.04em; min-width: 0; }
+.tb div:last-child { border-right: 0; }
+.tb small { display: block; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 1px solid var(--dim); }
+.timeline li { display: grid; grid-template-columns: 112px 1fr; gap: 12px; padding: 7px 0 7px 14px; border-bottom: 1px dashed rgba(157, 185, 232, 0.45); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline time { font: 500 12.5px var(--f-mono); color: var(--chalk); }
+.timeline li > div { min-width: 0; }
+@media (max-width: 480px) { .timeline li { grid-template-columns: 1fr; gap: 0; } }
+a { color: var(--chalk); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--chalk); outline-offset: 2px; }
+.src { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.src a { overflow-wrap: anywhere; }
+/* drawing styles */
+svg .ln { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+svg .fb { fill: var(--bg); }
+svg .hid { fill: none; stroke: var(--dim); stroke-width: 1.2; stroke-dasharray: 5 4; }
+svg .ch { fill: none; stroke: var(--chalk); stroke-width: 1.6; stroke-linecap: round; }
+svg .hatch { stroke: var(--dim); stroke-width: 1; }
+svg .t { font: 400 12.5px var(--f-mono); fill: var(--ink); }
+svg .td { fill: var(--dim); }
+svg .tc { fill: var(--chalk); }
+svg .tl { font-size: 15px; font-weight: 500; }
+svg .tk { text-anchor: middle; }
+svg .te { text-anchor: end; }
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sheet { break-inside: avoid; }
+  .scroll { overflow: visible; }
+}
+</style>
+
+<main class="wrap">
+
+<!-- SHEET 1 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 1 of 7 · Overview</span><span>Rev A · 16 Oct 2026</span></div>
+  <div class="sheet-body">
+    <h1>Tesla Roadster<br>Thrust &amp; Suction Systems</h1>
+    <span class="stamp">Schematic · not to scale · not a Tesla drawing</span>
+    <p>Tesla showed its next Roadster at a SpaceX test site in Texas on 15 October 2026. It drove up a ramp and hung upside down, flipped in the air, leapt over a row of Teslas and landed on jets of air. These sheets explain the physics behind each trick. Every figure is either from a named report or marked as my own estimate.</p>
+    <div class="note">
+      <h3>Four corrections to the common version of the story</h3>
+      <ul>
+        <li><b>No jet engine and no fuel.</b> The thrusters use compressed air from tanks. Nothing burns.</li>
+        <li><b>It hops. It does not fly.</b> The demo car had no driver and was not shown in sustained flight.</li>
+        <li><b>The upside-down grip is suction fans.</b> It is not a suspension feature.</li>
+        <li><b>The Chinese tunnel loop is a different trick.</b> It relies on speed and a rigid chassis, and a Mercedes SLS AMG did a similar loop earlier.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What was reported</h3>
+      <div class="scroll">
+      <table>
+        <thead><tr><th>Item</th><th>Reported value</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Air thrusters</td><td>10 nozzles on ultra-high-pressure air</td><td class="m">Several outlets</td></tr>
+          <tr><td>Air storage</td><td>2 composite tanks, 600 L total, about 250 kg of air, refillable on board</td><td class="m">Tesla engineer, 2 outlets</td></tr>
+          <tr><td>Suction fans</td><td>Up to 2 g of downforce, fitted to all three trims</td><td class="m">Tesla engineer</td></tr>
+          <tr><td>0–60 mph</td><td>0.81 s in a video, first quoted as 1.0 s</td><td class="m">Claim</td></tr>
+          <tr><td>Top speed</td><td>Over 230 mph (one outlet says over 250)</td><td class="m">Conflicting</td></tr>
+          <tr><td>Range</td><td>300+ miles (two outlets) or 620 miles (one outlet)</td><td class="m">Conflicting</td></tr>
+          <tr><td>Battery size</td><td>Not announced at the event</td><td class="m">Not disclosed</td></tr>
+          <tr><td>Production</td><td>2028, per Musk</td><td class="m">Promise</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Subject</small>Roadster, 2nd generation</div>
+    <div><small>Basis</small>Public reports only</div>
+    <div><small>Drawn by</small>Claude, for Jeff</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+<!-- SHEET 2 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 2 of 7 · Air system</span><span>Side view · car faces right</span></div>
+  <div class="sheet-body">
+    <h2>Compressed-air thrusters</h2>
+    <div class="scroll">
+    <svg viewBox="0 0 760 380" role="img" aria-label="Side view of the Roadster showing two air tanks, a pump, a battery and nozzles under, behind and in front of the car">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#ffd96b"/></marker>
+        <pattern id="g2" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10 L10 0" class="hatch"/></pattern>
+      </defs>
+      <rect x="20" y="312" width="720" height="14" fill="url(#g2)"/>
+      <line x1="20" y1="312" x2="740" y2="312" class="ln"/>
+      <circle cx="190" cy="276" r="36" class="ln"/><circle cx="190" cy="276" r="15" class="ln"/>
+      <circle cx="560" cy="276" r="36" class="ln"/><circle cx="560" cy="276" r="15" class="ln"/>
+      <path d="M70 270 L88 240 L250 218 L410 196 L510 198 L630 226 L712 246 L716 270 Z" class="ln fb"/>
+      <path d="M392 198 L446 174 L506 176 L572 220" class="ln"/>
+      <!-- hidden parts -->
+      <rect x="250" y="224" width="80" height="24" rx="12" class="hid"/>
+      <rect x="340" y="224" width="80" height="24" rx="12" class="hid"/>
+      <rect x="434" y="228" width="40" height="20" class="hid"/>
+      <rect x="112" y="244" width="120" height="16" class="hid"/>
+      <path d="M290 248 L290 262 M380 248 L380 262 M454 248 L454 262" class="hid"/>
+      <path d="M270 262 L500 262" class="hid"/>
+      <!-- nozzles under body -->
+      <g class="ln">
+        <path d="M265 270 L275 270 L278 282 L262 282 Z"/><path d="M335 270 L345 270 L348 282 L332 282 Z"/>
+        <path d="M425 270 L435 270 L438 282 L422 282 Z"/><path d="M495 270 L505 270 L508 282 L492 282 Z"/>
+      </g>
+      <g class="ch" marker-end="url(#a2)">
+        <path d="M270 286 L270 308" marker-end="url(#a2)"/><path d="M340 286 L340 308" marker-end="url(#a2)"/>
+        <path d="M430 286 L430 308" marker-end="url(#a2)"/><path d="M500 286 L500 308" marker-end="url(#a2)"/>
+      </g>
+      <path d="M270 262 L270 270 M340 262 L340 270 M430 262 L430 270 M500 262 L500 270" class="hid"/>
+      <!-- rear and front nozzles -->
+      <path d="M72 262 L62 258 L62 268 Z" class="ln"/><path d="M58 263 L30 263" class="ch" marker-end="url(#a2)"/>
+      <path d="M712 252 L722 248 L722 258 Z" class="ln"/><path d="M726 253 L752 253" class="ch" marker-end="url(#a2)"/>
+      <!-- callouts -->
+      <path d="M290 222 L290 160" class="hid"/><text x="170" y="154" class="t">COPV TANKS ×2 · 600 L · ≈250 kg AIR</text>
+      <path d="M454 226 L454 136" class="hid"/><text x="454" y="112" class="t tk">AIR PUMP</text>
+      <path d="M172 244 L172 206" class="hid"/><text x="30" y="200" class="t">BATTERY (SIZE NOT ANNOUNCED)</text>
+      <text x="454" y="128" class="t tk td">recharges the tanks</text>
+      <text x="380" y="346" class="t tk tc">UNDERBODY NOZZLES: JET DOWN, CAR PUSHED UP</text>
+      <text x="20" y="368" class="t">REAR NOZZLES</text>
+      <text x="740" y="368" class="t te">FRONT NOZZLES</text>
+      <text x="380" y="368" class="t tk td">pipework shown dashed</text>
+    </svg>
+    </div>
+    <div class="cols">
+      <div class="plain"><h3>How it works</h3>
+        <p>Air at very high pressure is released through a nozzle. The air rushes one way and pushes the car the other way. That is Newton's third law, the same principle SpaceX uses for small attitude jets. Nothing is burned, so there is no flame and no fuel tank.</p></div>
+      <div class="plain"><h3>What the numbers imply (my estimate)</h3>
+        <ul>
+          <li>250 kg in 600 L is about 417 kg per cubic metre, roughly 340 times denser than air at sea level.</li>
+          <li>That is about 350–450 bar by the ideal gas law, with real-gas effects pushing it higher. Musk's 2018 plan quoted 10,000 psi (690 bar).</li>
+          <li>Reports say 4 nozzles are under the car and 2 at the front. The positions of all 10 were not published.</li>
+        </ul></div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>2 · Air system</div>
+    <div><small>Sources</small>TechCrunch, Paul Tan, InsideEVs</div>
+    <div><small>Estimates</small>Density and pressure</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+<!-- SHEET 3 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 3 of 7 · Balance</span><span>Top view · car faces right</span></div>
+  <div class="sheet-body">
+    <h2>Staying level in the air</h2>
+    <div class="scroll">
+    <svg viewBox="0 0 760 300" role="img" aria-label="Top view of the car with thruster positions and a four-step feedback loop of sense, decide, act and result">
+      <defs>
+        <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#ffd96b"/></marker>
+        <marker id="a3w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#eaf2ff"/></marker>
+      </defs>
+      <path d="M20 155 L350 155" class="hid"/><path d="M190 70 L190 240" class="hid"/>
+      <rect x="40" y="95" width="290" height="120" rx="34" class="ln fb"/>
+      <rect x="150" y="120" width="110" height="70" rx="20" class="hid"/>
+      <g class="ln"><circle cx="190" cy="155" r="8"/><path d="M180 155 L200 155 M190 145 L190 165"/></g>
+      <g class="ln">
+        <circle cx="110" cy="120" r="7"/><circle cx="110" cy="190" r="7"/><circle cx="312" cy="130" r="7"/><circle cx="312" cy="180" r="7"/><circle cx="56" cy="155" r="7"/>
+      </g>
+      <g fill="#eaf2ff"><circle cx="110" cy="120" r="2.5"/><circle cx="110" cy="190" r="2.5"/><circle cx="312" cy="130" r="2.5"/><circle cx="312" cy="180" r="2.5"/><circle cx="56" cy="155" r="2.5"/></g>
+      <circle cx="270" cy="120" r="9" class="ch"/><circle cx="270" cy="120" r="3" fill="#ffd96b"/>
+      <circle cx="270" cy="190" r="7" class="ln"/><circle cx="270" cy="190" r="2.5" fill="#eaf2ff"/>
+      <path d="M190 155 L262 123" class="ch"/><text x="222" y="130" class="t tc">r</text>
+      <path d="M270 110 L270 80" class="ch"/><text x="278" y="86" class="t tc">F</text>
+      <path d="M166 138 A34 34 0 0 0 166 172" class="ch" marker-end="url(#a3)"/>
+      <text x="190" y="62" class="t tk td">PITCH AXIS</text><text x="356" y="159" class="t td">ROLL AXIS</text>
+      <text x="40" y="84" class="t td">CG = centre of mass</text>
+      <circle cx="46" cy="258" r="7" class="ln"/><circle cx="46" cy="258" r="2.5" fill="#eaf2ff"/>
+      <text x="62" y="262" class="t">force on car, toward you (jet points down)</text>
+      <text x="40" y="288" class="t tc">Uneven thrust → torque τ = r × F → the car rolls or pitches</text>
+      <!-- control loop -->
+      <g class="ln"><rect x="410" y="60" width="150" height="56"/><rect x="590" y="60" width="150" height="56"/><rect x="590" y="190" width="150" height="56"/><rect x="410" y="190" width="150" height="56"/></g>
+      <g class="t tk td"><text x="485" y="82">SENSE</text><text x="665" y="82">DECIDE</text><text x="665" y="212">ACT</text><text x="485" y="212">RESULT</text></g>
+      <g class="t tk"><text x="485" y="102">IMU · GYROS</text><text x="665" y="102">FLIGHT COMPUTER</text><text x="665" y="232">VALVES · NOZZLES</text><text x="485" y="232">CAR MOVES</text></g>
+      <g fill="none" stroke="#eaf2ff" stroke-width="1.6">
+        <path d="M562 88 L588 88" marker-end="url(#a3w)"/><path d="M665 118 L665 188" marker-end="url(#a3w)"/>
+        <path d="M588 218 L562 218" marker-end="url(#a3w)"/><path d="M485 188 L485 118" marker-end="url(#a3w)"/>
+      </g>
+      <text x="575" y="150" class="t tk tc">FEEDBACK LOOP</text><text x="575" y="168" class="t tk td">repeats continuously</text>
+    </svg>
+    </div>
+    <div class="cols">
+      <div class="plain"><h3>The problem</h3>
+        <p>A car held up on jets has nothing like wings or wheels to keep it steady. If one jet pushes harder than the others, the car turns around its centre of mass. Left alone, a small tilt grows into a flip. Pushing at a distance <b>r</b> from the centre makes a turning force <b>τ = r × F</b>.</p></div>
+      <div class="plain"><h3>The fix</h3>
+        <p>Sensors measure the tilt, a computer works out which nozzles to open and by how much, and the nozzles correct it. This loop runs again and again, many times a second. Rocket landings work the same way. In the demo, reports say two front thrusters helped turn the car right side up. Tesla has not published its control design, so this loop shows the standard method, not Tesla's actual code.</p></div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>3 · Balance</div>
+    <div><small>Sources</small>InsideEVs (nozzle positions)</div>
+    <div><small>Estimates</small>Loop is generic</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+<!-- SHEET 4 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 4 of 7 · Suction</span><span>Side section · car faces right</span></div>
+  <div class="sheet-body">
+    <h2>Fans that pin the car down</h2>
+    <div class="scroll">
+    <svg viewBox="0 0 760 300" role="img" aria-label="Side section of the car showing a sealed low-pressure region under the body, a fan pulling air out, and ambient pressure pushing down on top">
+      <defs>
+        <marker id="a4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#ffd96b"/></marker>
+        <pattern id="g4" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10 L10 0" class="hatch"/></pattern>
+        <pattern id="d4" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.9" fill="#9db9e8"/></pattern>
+      </defs>
+      <rect x="20" y="250" width="720" height="14" fill="url(#g4)"/><line x1="20" y1="250" x2="740" y2="250" class="ln"/>
+      <circle cx="190" cy="222" r="28" class="ln"/><circle cx="470" cy="222" r="28" class="ln"/>
+      <rect x="250" y="206" width="160" height="38" fill="url(#d4)"/>
+      <path d="M110 206 L128 176 L300 154 L420 154 L500 178 L540 206 Z" class="ln fb"/>
+      <path d="M300 156 L340 132 L410 132 L450 160" class="ln"/>
+      <rect x="250" y="206" width="160" height="38" fill="url(#d4)"/>
+      <path d="M250 206 L250 244 M410 206 L410 244" class="ln" style="stroke-width:3"/>
+      <circle cx="330" cy="186" r="14" class="ln fb"/><path d="M330 174 L330 198 M318 186 L342 186" class="ln"/>
+      <path d="M330 234 L330 206" class="ch" marker-end="url(#a4)"/>
+      <path d="M316 186 L72 186" class="ch" marker-end="url(#a4)"/>
+      <g class="ch"><path d="M170 96 L170 148" marker-end="url(#a4)"/><path d="M230 96 L230 146" marker-end="url(#a4)"/><path d="M480 96 L480 166" marker-end="url(#a4)"/></g>
+      <text x="170" y="84" class="t">AMBIENT PRESSURE P0 PUSHES DOWN</text>
+      <text x="20" y="176" class="t tc">AIR OUT</text>
+      <text x="282" y="232" class="t tk tc">P0 − ΔP</text>
+      <text x="352" y="170" class="t td">FAN</text>
+      <text x="250" y="284" class="t tk td">SKIRT</text><text x="410" y="284" class="t tk td">SKIRT</text>
+      <text x="560" y="108" class="t td">SUCTION FORCE</text>
+      <text x="560" y="134" class="t tl">F = ΔP × A</text>
+      <text x="560" y="168" class="t">2 g on 2,000 kg</text><text x="560" y="188" class="t tc">= 39 kN</text>
+      <text x="560" y="222" class="t">A = 2 m² → ~20 kPa</text><text x="560" y="242" class="t">A = 4 m² → ~10 kPa</text>
+    </svg>
+    </div>
+    <div class="scroll">
+    <svg viewBox="0 0 760 260" role="img" aria-label="Car hanging upside down under a surface with arrows for suction, weight and tyre contact force">
+      <defs><marker id="a4b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#ffd96b"/></marker>
+      <pattern id="g4b" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10 L10 0" class="hatch"/></pattern></defs>
+      <rect x="20" y="26" width="720" height="14" fill="url(#g4b)"/><line x1="20" y1="40" x2="740" y2="40" class="ln"/>
+      <text x="20" y="18" class="t td">RAMP SURFACE (CAR IS UPSIDE DOWN BELOW IT)</text>
+      <circle cx="190" cy="68" r="28" class="ln"/><circle cx="470" cy="68" r="28" class="ln"/>
+      <path d="M110 84 L128 114 L300 136 L420 136 L500 112 L540 84 Z" class="ln fb"/>
+      <path d="M300 134 L340 158 L410 158 L450 130" class="ln"/>
+      <g class="ln"><circle cx="270" cy="110" r="6"/></g>
+      <text x="40" y="196" class="t">S = W + N, so N = S − W</text>
+      <text x="40" y="218" class="t">With S = 2W the tyres carry N = W,</text>
+      <text x="40" y="240" class="t tc">the same load as on a flat road.</text>
+      <text x="600" y="62" class="t tk td">FORCES ON CAR</text>
+      <g class="ch"><path d="M600 200 L600 126" marker-end="url(#a4b)"/><path d="M640 116 L640 156" marker-end="url(#a4b)"/><path d="M680 116 L680 156" marker-end="url(#a4b)"/></g>
+      <text x="600" y="116" class="t tk">S = 2W</text>
+      <text x="640" y="176" class="t tk">W</text><text x="680" y="176" class="t tk">N</text>
+    </svg>
+    </div>
+    <div class="cols">
+      <div class="plain"><h3>How the grip works</h3>
+        <p>Skirts seal a space under the car. Fans pull air out of that space, so the pressure there falls below the pressure outside. The outside air then pushes the car toward the road with a force of ΔP × A. For 2 g on a 2-tonne car, that is 39 kN. Over 2–4 m² of floor, the pressure drop is only about 0.1–0.2 of an atmosphere.</p></div>
+      <div class="plain"><h3>History and limits</h3>
+        <p>Race engineers have used the same idea since the Chaparral 2J (1970) and the Brabham BT46B (1978). Reports compare the Roadster to the McMurtry fan car. Tesla says tyres alone give about 1.26 g of grip, and the fans let it corner above 2 g. Upside down, suction must exceed the car's own weight before the tyres press on the surface at all.</p></div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>4 · Suction</div>
+    <div><small>Sources</small>Paul Tan, InsideEVs, Yahoo Finance</div>
+    <div><small>Estimates</small>Area and ΔP, mass 2,000 kg</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+<!-- SHEET 5 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 5 of 7 · Energy</span><span>Drawn to scale (bars)</span></div>
+  <div class="sheet-body">
+    <h2>Why it hops and does not cruise</h2>
+    <p>I assumed a 2,000 kg car because Tesla gave no weight. All figures below scale with the real weight, and a heavier car makes every hover figure worse.</p>
+    <div class="scroll">
+    <svg viewBox="0 0 760 262" role="img" aria-label="Bar chart of hover power in megawatts for a cold-gas jet, two rotor sizes, and the average power of a 0 to 60 run">
+      <g stroke="#9db9e8" stroke-width="1" stroke-dasharray="3 5" opacity="0.7">
+        <path d="M200 14 L200 226"/><path d="M290 14 L290 226"/><path d="M380 14 L380 226"/><path d="M470 14 L470 226"/><path d="M560 14 L560 226"/><path d="M650 14 L650 226"/><path d="M740 14 L740 226"/>
+      </g>
+      <path d="M200 226 L740 226" class="ln"/>
+      <g class="t tk td"><text x="200" y="246">0</text><text x="290" y="246">1</text><text x="380" y="246">2</text><text x="470" y="246">3</text><text x="560" y="246">4</text><text x="650" y="246">5</text><text x="740" y="246">6 MW</text></g>
+      <text x="10" y="49" class="t">COLD-GAS JET</text><text x="10" y="101" class="t">ROTOR, 4 m²</text><text x="10" y="153" class="t">ROTOR, 20 m²</text><text x="10" y="205" class="t">0–60 RUN, AVG</text>
+      <rect x="200" y="30" width="520" height="28" fill="#eaf2ff"/><text x="712" y="49" class="t te" style="fill:#0e3a80;font-weight:500">5.8</text>
+      <rect x="200" y="82" width="79" height="28" fill="#eaf2ff"/><text x="288" y="101" class="t">0.88</text>
+      <rect x="200" y="134" width="35" height="28" fill="#eaf2ff"/><text x="244" y="153" class="t">0.39</text>
+      <rect x="200" y="186" width="80" height="28" class="hid" style="stroke:#ffd96b"/><text x="289" y="205" class="t tc">0.89, for scale</text>
+    </svg>
+    </div>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Air exit speed (assumed)</th><th class="m">Exit speed</th><th class="m">Air used to hover</th><th class="m">Hover time on 250 kg</th></tr></thead>
+      <tbody>
+        <tr><td>Low (specific impulse 50 s)</td><td class="m">490 m/s</td><td class="m">40 kg/s</td><td class="m">≈ 6.7 s</td></tr>
+        <tr><td>Mid (60 s)</td><td class="m">589 m/s</td><td class="m">33 kg/s</td><td class="m">≈ 8.0 s</td></tr>
+        <tr><td>High (70 s)</td><td class="m">687 m/s</td><td class="m">29 kg/s</td><td class="m">≈ 9.3 s</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="cols">
+      <div class="plain"><h3>Reading the chart</h3>
+        <p>Holding 2 tonnes in the air needs about 20 kN of thrust. A real rotor moves a lot of air slowly, which is cheap in power. A jet of air at 500–700 m/s is the opposite, so it needs about 5.8 MW, more than six times what a 4 m² rotor needs. That is the reason helicopters and eVTOLs use big rotors.</p></div>
+      <div class="plain"><h3>Refilling the tank</h3>
+        <p>The pump takes its power from the battery. Squeezing 250 kg of air to about 360 bar takes at least 35 kWh even with perfect cooling, and real compressors need more. The speed ceiling for room-temperature air is about 780 m/s, so even a perfect nozzle cannot hover for much longer than ten seconds.</p></div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>5 · Energy</div>
+    <div><small>Method</small>Rocket equation, momentum theory</div>
+    <div><small>Estimates</small>All values on this sheet</div>
+    <div><small>Scale</small>Bars 90 px per MW</div>
+  </div>
+</section>
+
+<!-- SHEET 6 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 6 of 7 · Tunnel loop</span><span>Front view of a loop</span></div>
+  <div class="sheet-body">
+    <h2>The Chinese tunnel loop</h2>
+    <div class="scroll">
+    <svg viewBox="0 0 760 300" role="img" aria-label="A car at the top of a circular tunnel loop with arrows for velocity, weight and wall force">
+      <defs><marker id="a6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 Z" fill="#ffd96b"/></marker></defs>
+      <circle cx="190" cy="150" r="100" class="ln"/><circle cx="190" cy="150" r="113" class="hid"/>
+      <rect x="172" y="52" width="36" height="14" rx="5" class="ln fb"/>
+      <circle cx="178" cy="52" r="4" class="ln fb"/><circle cx="202" cy="52" r="4" class="ln fb"/>
+      <g class="ch"><path d="M170 66 L170 106" marker-end="url(#a6)"/><path d="M210 66 L210 106" marker-end="url(#a6)"/><path d="M150 32 L232 32" marker-end="url(#a6)"/></g>
+      <text x="162" y="120" class="t te tc">N</text><text x="218" y="120" class="t tc">W</text><text x="240" y="36" class="t tc">v</text>
+      <circle cx="190" cy="150" r="3" fill="#eaf2ff"/><path d="M190 150 L103 200" class="hid"/><text x="136" y="166" class="t">r</text>
+      <text x="360" y="58" class="t td">AT THE TOP OF THE LOOP</text>
+      <text x="360" y="84" class="t tl">N + W = m v² / r</text>
+      <text x="360" y="108" class="t">N ≥ 0 means v ≥ √(g r)</text>
+      <text x="360" y="142" class="t">130 km/h = 36.1 m/s</text>
+      <text x="360" y="164" class="t tc">r ≤ v² / g ≈ 133 m</text>
+      <text x="360" y="192" class="t td">Loop radius was not reported.</text>
+      <text x="360" y="212" class="t td">Any loop up to ~133 m radius stays</text>
+      <text x="360" y="232" class="t td">on the wall by speed alone.</text>
+      <text x="360" y="262" class="t">Reported apex speed loss: 3–5 km/h</text>
+      <text x="360" y="282" class="t">Reported entry steering angle: 16°</text>
+    </svg>
+    </div>
+    <div class="cols">
+      <div class="plain"><h3>What was reported</h3>
+        <p>On 13 August 2026 Voyah said its Zhui Guang S became the first unmodified production car to complete a 360° loop in a closed test tunnel in Wuhan. It entered at about 130 km/h. The car has an aluminium double-wishbone front and five-link rear suspension, ten aero ducts, and 475 kW from two motors. The report says the Mercedes SLS AMG, a lighter supercar, had done a similar loop before.</p></div>
+      <div class="plain"><h3>What it is not</h3>
+        <p>The loop does not use suction. At speed the car stays on the wall because its path is curved, the same reason water stays in a swung bucket. Tyres and suspension then have to take the load and hold the car's line. It is a real engineering result, but it is separate from Tesla's fans and does not show that Mercedes failed at anything.</p></div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>6 · Tunnel loop</div>
+    <div><small>Source</small>Internet Info Agency, 13 Aug 2026</div>
+    <div><small>Estimates</small>r ≤ v² / g</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+<!-- SHEET 7 -->
+<section class="sheet">
+  <div class="sheet-head"><span>Sheet 7 of 7 · History, limits, sources</span><span>Rev A</span></div>
+  <div class="sheet-body">
+    <h2>From cartoons to the test pad</h2>
+    <ul class="timeline">
+      <li><time>1917</time><div>Curtiss Autoplane, an early attempt at a flying car.</div></li>
+      <li><time>1949</time><div>Taylor Aerocar, a road car that could be fitted with wings and flown.</div></li>
+      <li><time>1962</time><div>The Jetsons put a bubble-top flying car on television.</div></li>
+      <li><time>1970</time><div>Chaparral 2J, a race car that used fans to suck itself onto the track.</div></li>
+      <li><time>1974</time><div>The Man with the Golden Gun, a Bond film with a flying car.</div></li>
+      <li><time>1978</time><div>Brabham BT46B fan car, banned after one race.</div></li>
+      <li><time>1989</time><div>Back to the Future Part II, with a flying DeLorean.</div></li>
+      <li><time>Jun 2018</time><div>Musk says a SpaceX package for the Roadster will include about 10 small thrusters.</div></li>
+      <li><time>Aug 2025</time><div>Tesla is granted a patent for a fan suction system.</div></li>
+      <li><time>13 Aug 2026</time><div>Voyah completes the 360° tunnel loop in Wuhan.</div></li>
+      <li><time>15 Oct 2026</time><div>Tesla shows the Roadster with thrusters and fans in Texas.</div></li>
+    </ul>
+    <p class="td" style="color:var(--dim);font-size:14px">Dates before 2018 come from general knowledge and were not checked in this session's searches.</p>
+    <div class="note">
+      <h3>What is still unknown</h3>
+      <ul>
+        <li>Battery capacity, power output and weight. Range figures conflict between outlets.</li>
+        <li>How long the car can stay airborne. The demo showed short hops with no driver.</li>
+        <li>Whether a road-legal car can carry the tanks and still meet crash rules. Edmunds noted the demo car bounced as if it had no suspension.</li>
+        <li>Whether 2028 production happens. A Smithsonian curator told CNN a hybrid would be a poor aircraft and a poor car.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Sources</h3>
+      <div class="src">
+        <a href="https://abc17news.com/money/cnn-business-consumer/2026/10/15/tesla-unveils-what-it-says-is-a-flying-car/">CNN via ABC17: Tesla unveils what it says is a flying car</a>
+        <a href="https://www.edmunds.com/car-news/tesla-roadster-flying-car-debut-first-look.html">Edmunds: Tesla Roadster revealed</a>
+        <a href="https://paultan.org/2026/10/16/tesla-roadster-revealed-flies-on-spacex-air-thrusters-0-96-km-h-in-0-81s-production-2028/">Paul Tan: tank and fan details</a>
+        <a href="https://insideevs.com/news/812152/tesla-roadster-backflip-suction-2g/">InsideEVs: the tricks the Roadster did</a>
+        <a href="https://techcrunch.com/2026/10/15/tesla-reveals-spacex-powered-roadster-that-flies-and-falls-with-style/">TechCrunch: Roadster with SpaceX thrusters</a>
+        <a href="https://interestingengineering.com/transportation/elon-musk-flying-car-tesla-roadster">Interesting Engineering: flying car stunt</a>
+        <a href="https://english.news18a.com/news/english_285845.html">Internet Info Agency: Voyah tunnel loop</a>
+        <a href="https://fortune.com/2018/06/10/musk-tesla-roadster-spacex-rocket-thrusters">Fortune, 2018: SpaceX thruster package</a>
+      </div>
+    </div>
+  </div>
+  <div class="tb">
+    <div><small>Sheet</small>7 · History and sources</div>
+    <div><small>Date</small>16 Oct 2026</div>
+    <div><small>Status</small>Reports as of reveal day</div>
+    <div><small>Scale</small>NTS</div>
+  </div>
+</section>
+
+</main>
